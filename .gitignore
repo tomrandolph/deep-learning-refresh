@@ -1,6 +1,6 @@
-# Datasets
+# DL
 datasets/
-
+checkpoints/
 # Ruff
 .ruff_cache/
 
