@@ -69,12 +69,12 @@ def train(
 
 
 if __name__ == "__main__":
-    mnist_training_dataset = torchvision.datasets.MNIST(
-        root="./datasets",
-        download=True,
-        train=True,
-        transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
-    )
+    # mnist_training_dataset = torchvision.datasets.MNIST(
+    #     root="./datasets",
+    #     download=True,
+    #     train=True,
+    #     transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
+    # )
 
     mnist_test_dataset = torchvision.datasets.MNIST(
         root="./datasets",
@@ -83,14 +83,46 @@ if __name__ == "__main__":
         transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor()]),
     )
 
-    mnist_training_dataloader = DataLoader(mnist_training_dataset)
+    # mnist_training_dataloader = DataLoader(mnist_training_dataset)
 
     mnist_test_dataloader = DataLoader(mnist_test_dataset)
 
+    # device = torch.device("mps")  # on mac
+
+    # print("using device", device)
+    # model = Classifier()
+    # train(model, mnist_training_dataloader, mnist_test_dataloader, num_epochs=2)
+
+    # torch.save(model.state_dict(), "checkpoints/mnist_cnn.pt")
+
     device = torch.device("mps")  # on mac
-
-    print("using device", device)
     model = Classifier()
-    train(model, mnist_training_dataloader, mnist_test_dataloader, num_epochs=2)
+    model.load_state_dict(torch.load("checkpoints/mnist_cnn.pt"))
+    model.eval()
+    model = model.to(device)
 
-    torch.save(model.state_dict(), "checkpoints/mnist_cnn.pt")
+    # Make predictions
+
+    # Plot the images and their predicted labels
+    import matplotlib.pyplot as plt
+
+    fig, axs = plt.subplots(4, 5, figsize=(15, 12))  # Create a grid of 4x5 subplots
+    axs = axs.ravel()  # Flatten the grid to easily iterate over it
+
+    for i, (image, label) in enumerate(iter(mnist_test_dataloader)):
+        if i >= 20:
+            break
+        # Move images and labels to the device
+        image = image.to(device)
+        label = label.to(device)
+
+        outputs = model(image)
+        _, predicted = torch.max(outputs, 1)
+
+        image = image.cpu().numpy().squeeze()  # Move image to cpu and convert to numpy
+        axs[i].imshow(image, cmap="gray")
+        axs[i].set_title(f"Predicted: {predicted.squeeze().item()}")
+        axs[i].axis("off")  # Hide axis
+
+    plt.tight_layout()
+    plt.show()
