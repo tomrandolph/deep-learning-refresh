@@ -93,11 +93,11 @@ if __name__ == "__main__":
     # model = Classifier()
     # train(model, mnist_training_dataloader, mnist_test_dataloader, num_epochs=2)
 
-    # torch.save(model.state_dict(), "checkpoints/mnist_cnn.pt")
+    # torch.save(model.state_dict(), "checkpoints/mnist_fc.pt")
 
     device = torch.device("mps")  # on mac
     model = Classifier()
-    model.load_state_dict(torch.load("checkpoints/mnist_cnn.pt"))
+    model.load_state_dict(torch.load("checkpoints/mnist_fc.pt"))
     model.eval()
     model = model.to(device)
 
